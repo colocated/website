@@ -1,65 +1,52 @@
-import Image from "next/image";
+import { CubeIcon, DiscordLogoIcon, GithubLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr";
+import ShaderBackground from "./ShaderBackground";
+
+function getAge(birth: Date, now: Date) {
+  let age = now.getUTCFullYear() - birth.getUTCFullYear();
+  const m = now.getUTCMonth() - birth.getUTCMonth();
+  if (m < 0 || (m === 0 && now.getUTCDate() < birth.getUTCDate())) age--;
+  return age;
+}
+
+const links = [
+  { href: "https://github.com/colocated", label: "GitHub", Icon: GithubLogoIcon },
+  { href: "https://discord.com/users/324596012955992065", label: "Discord", Icon: DiscordLogoIcon },
+  { href: "https://namemc.com/profile/colocated.1", label: "NameMC", Icon: CubeIcon },
+  { href: "https://x.com/colocated_", label: "X", Icon: XLogoIcon },
+];
 
 export default function Home() {
+  const age = getAge(new Date(Date.UTC(2005, 7, 25)), new Date());
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      <ShaderBackground />
+      <div className="fixed inset-0 -z-10 bg-black/70" aria-hidden />
+      <div className="flex flex-col items-center gap-4 text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
+        <h1 className="select-none font-audiowide text-center text-3xl uppercase tracking-wide sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+          Colocated
+          <sup className="ml-1 align-super font-sans text-base font-medium italic tracking-normal normal-case text-white/60 sm:text-lg md:text-xl">
+            ({age})
+          </sup>
+        </h1>
+        <p className="select-none text-center text-sm font-light italic text-white/80 sm:text-base md:text-lg lg:text-xl">
+          Systems Engineer · Professional Goofball
+        </p>
+        <ul className="mt-2 flex items-center gap-5">
+          {links.map(({ href, label, Icon }) => (
+            <li key={label}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={label}
+                className="inline-flex text-white/70 transition-colors hover:text-white"
+              >
+                <Icon size={28} weight="regular" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </main>
   );
 }
