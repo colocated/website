@@ -1,4 +1,4 @@
-import { CubeIcon, DiscordLogoIcon, GithubLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr";
+import { CubeIcon, DiscordLogoIcon, EnvelopeSimpleIcon, GithubLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr";
 import ShaderBackground from "./ShaderBackground";
 
 function getAge(birth: Date, now: Date) {
@@ -13,6 +13,7 @@ const links = [
   { href: "https://discord.com/users/324596012955992065", label: "Discord", Icon: DiscordLogoIcon },
   { href: "https://namemc.com/profile/colocated.1", label: "NameMC", Icon: CubeIcon },
   { href: "https://x.com/colocated_", label: "X", Icon: XLogoIcon },
+  { href: "mailto:me@colocated.dev", label: "Email", Icon: EnvelopeSimpleIcon },
 ];
 
 export default function Home() {
