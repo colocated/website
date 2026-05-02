@@ -1,7 +1,8 @@
 import { CubeIcon, DiscordLogoIcon, EnvelopeSimpleIcon, GithubLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr";
+import Age from "./Age";
 import ShaderBackground from "./ShaderBackground";
 
-function getAge(birth: Date, now: Date) {
+function buildTimeAge(birth: Date, now: Date) {
   let age = now.getUTCFullYear() - birth.getUTCFullYear();
   const m = now.getUTCMonth() - birth.getUTCMonth();
   if (m < 0 || (m === 0 && now.getUTCDate() < birth.getUTCDate())) age--;
@@ -17,7 +18,7 @@ const links = [
 ];
 
 export default function Home() {
-  const age = getAge(new Date(Date.UTC(2005, 7, 25)), new Date());
+  const initialAge = buildTimeAge(new Date(Date.UTC(2005, 7, 25)), new Date());
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden">
       <ShaderBackground />
@@ -26,7 +27,7 @@ export default function Home() {
         <h1 className="select-none font-audiowide text-center text-3xl uppercase tracking-wide sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
           Colocated
           <sup className="ml-1 align-super font-sans text-base font-medium italic tracking-normal normal-case text-white/60 sm:text-lg md:text-xl">
-            ({age})
+            (<Age initial={initialAge} />)
           </sup>
         </h1>
         <p className="select-none text-center text-sm font-light italic text-white/80 sm:text-base md:text-lg lg:text-xl">
