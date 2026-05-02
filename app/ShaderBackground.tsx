@@ -20,7 +20,7 @@ out vec4 outColor;
 #define WAVES
 #define BORDER
 
-#define RAY_STEPS 150
+#define RAY_STEPS 90
 
 #define BRIGHTNESS 1.2
 #define GAMMA 1.4
@@ -184,42 +184,33 @@ export default function ShaderBackground() {
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error("Program link error:", gl.getProgramInfoLog(program));
-      return;
-    }
-    gl.useProgram(program);
 
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      gl.STATIC_DRAW,
-    );
-    const posLoc = gl.getAttribLocation(program, "a_position");
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+    const parallelExt = gl.getExtension("KHR_parallel_shader_compile") as
+      | { COMPLETION_STATUS_KHR: number }
+      | null;
 
-    const uTime = gl.getUniformLocation(program, "iTime");
-    const uRes = gl.getUniformLocation(program, "iResolution");
-    const uMouse = gl.getUniformLocation(program, "iMouse");
+    let raf = 0;
+    let started = false;
+    let cancelled = false;
+    let buffer: WebGLBuffer | null = null;
+    let uTime: WebGLUniformLocation | null = null;
+    let uRes: WebGLUniformLocation | null = null;
+    let uMouse: WebGLUniformLocation | null = null;
+    let start = 0;
 
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const render = () => {
+      if (document.hidden) {
+        raf = requestAnimationFrame(render);
+        return;
+      }
+      const dpr = Math.min(window.devicePixelRatio || 1, 1);
       const w = Math.floor(canvas.clientWidth * dpr);
       const h = Math.floor(canvas.clientHeight * dpr);
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
+        gl.viewport(0, 0, w, h);
       }
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    };
-
-    const start = performance.now();
-    let raf = 0;
-    const render = () => {
-      resize();
       const time = (performance.now() - start) / 1000;
       gl.uniform1f(uTime, time);
       gl.uniform2f(uRes, canvas.width, canvas.height);
@@ -227,14 +218,55 @@ export default function ShaderBackground() {
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       raf = requestAnimationFrame(render);
     };
-    raf = requestAnimationFrame(render);
+
+    const beginRendering = () => {
+      if (started || cancelled) return;
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error("Program link error:", gl.getProgramInfoLog(program));
+        return;
+      }
+      started = true;
+      gl.useProgram(program);
+
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+        gl.STATIC_DRAW,
+      );
+      const posLoc = gl.getAttribLocation(program, "a_position");
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      uTime = gl.getUniformLocation(program, "iTime");
+      uRes = gl.getUniformLocation(program, "iResolution");
+      uMouse = gl.getUniformLocation(program, "iMouse");
+
+      start = performance.now();
+      raf = requestAnimationFrame(render);
+    };
+
+    const waitForCompile = () => {
+      if (cancelled) return;
+      if (
+        !parallelExt ||
+        gl.getProgramParameter(program, parallelExt.COMPLETION_STATUS_KHR)
+      ) {
+        beginRendering();
+        return;
+      }
+      raf = requestAnimationFrame(waitForCompile);
+    };
+    raf = requestAnimationFrame(waitForCompile);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
-      gl.deleteBuffer(buffer);
+      if (buffer) gl.deleteBuffer(buffer);
     };
   }, []);
 
