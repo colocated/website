@@ -9,8 +9,7 @@ const audiowide = Audiowide({
 });
 
 export const metadata: Metadata = {
-  title: "Colocated",
-  description: "Colocated",
+  title: "colocated's cool website",
 };
 
 export default function RootLayout({

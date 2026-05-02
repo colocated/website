@@ -25,7 +25,7 @@ export default function Home() {
       <div className="fixed inset-0 -z-10 bg-black/70" aria-hidden />
       <div className="flex flex-col items-center gap-4 text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
         <h1 className="select-none font-audiowide text-center text-3xl uppercase tracking-wide sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-          Colocated
+          colocated
           <sup className="ml-1 align-super font-sans text-base font-medium italic tracking-normal normal-case text-white/60 sm:text-lg md:text-xl">
             (<Age initial={initialAge} />)
           </sup>
